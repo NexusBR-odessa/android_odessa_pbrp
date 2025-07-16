@@ -50,7 +50,7 @@ jobs:
 
     - name: Upload to Artifacts
       if: success()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: pbrp-odessa-recovery
         path: pbrp/out/target/product/odessa/recovery.img
