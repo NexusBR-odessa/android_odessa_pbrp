@@ -53,4 +53,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: pbrp-odessa-recovery
-        path: pbrp/out/target/product/odessa/recovery.img
+        path: out/target/product/odessa/recovery.img
