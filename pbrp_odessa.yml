@@ -1,0 +1,56 @@
+name: Build PBRP for Moto G9 Plus (odessa)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: Check out this repo
+      uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y git-core gnupg flex bison build-essential zip curl zlib1g-dev \
+          gcc-multilib g++-multilib libc6-dev-i386 libncurses5-dev x11proto-core-dev libx11-dev \
+          libreadline-dev libgl1-mesa-glx libgl1-mesa-dev libxml2-utils xsltproc unzip fontconfig \
+          ccache python2 python-is-python2
+
+    - name: Setup Git and Repo
+      run: |
+        git config --global user.name "github-actions"
+        git config --global user.email "actions@github.com"
+        mkdir -p ~/bin
+        curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+        chmod +x ~/bin/repo
+        echo "PATH=$HOME/bin:$PATH" >> $GITHUB_ENV
+
+    - name: Initialize Repo
+      run: |
+        mkdir pbrp && cd pbrp
+        repo init -u https://github.com/PitchBlackRecoveryProject/manifest.git -b android-14.0
+        repo sync -c --force-sync --no-tags --no-clone-bundle -j$(nproc --all)
+
+    - name: Clone Device Tree
+      run: |
+        cd pbrp
+        git clone https://github.com/Team-NoobMaster69/android_device_motorola_odessa-twrp.git device/motorola/odessa
+        git clone https://github.com/Frost444/kernel_motorola_liber -b sap kernel/motorola/liber
+        git clone https://github.com/Frost444/proprietary_vendor_motorola vendor/motorola
+
+    - name: Build PBRP
+      run: |
+        cd pbrp
+        source build/envsetup.sh
+        lunch omni_odessa-eng
+        mka recoveryimage
+
+    - name: Upload to Artifacts
+      if: success()
+      uses: actions/upload-artifact@v3
+      with:
+        name: pbrp-odessa-recovery
+        path: pbrp/out/target/product/odessa/recovery.img
