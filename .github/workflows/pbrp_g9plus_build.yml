@@ -31,7 +31,7 @@ jobs:
     - name: Initialize Repo
       run: |
         mkdir pbrp && cd pbrp
-        repo init -u https://github.com/PitchBlackRecoveryProject/manifest.git -b android-14.0
+        repo init -u https://github.com/PitchBlackRecoveryProject/manifest_pb -b android-14.0
         repo sync -c --force-sync --no-tags --no-clone-bundle -j$(nproc --all)
 
     - name: Clone Device Tree
